@@ -1,7 +1,12 @@
+using System.Collections.Generic;
+
 namespace GyroPlayer.Core.Interfaces
 {
     public interface IMusicSourceDataAccess
     {
-        void BuildDataAccess();
+        void BuildData();
+        IEnumerable<IArtist> GetArtists();
+        IEnumerable<IAlbum> GetAlbums(string queryArtistName);
+        IEnumerable<ISong> GetSongs(string queryArtistName, string queryAlbumTitle);
     }
 }

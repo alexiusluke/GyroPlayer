@@ -13,36 +13,55 @@ namespace GyroPlayer.Core
 {
     public class JsonMusicDataAccess : IMusicSourceDataAccess
     {
-        private readonly string _jsonUri;
-        private IEnumerable<Artist> _artists;
+        private readonly string _jsonUri;              
+        private JObject _musicLibraryJsonData;
 
         public JsonMusicDataAccess(string jsonUri)
         {
             _jsonUri = jsonUri;
         }
 
-        public void BuildDataAccess()
-        {
+        public void BuildData()
+        {           
+            //"https://gist.githubusercontent.com/edj-boston/77b2cdc0cad5b5d42219/raw/1366c213a5b0ae29f1d29d0bc1d22d29f2586068/music.json";
             WebRequest request = WebRequest.Create(new Uri(_jsonUri));
             request.ContentType = "application/json; charset=utf-8";
-            var response = (HttpWebResponse)request.GetResponse();
+            var response = (HttpWebResponse) request.GetResponse();
             var responseStream = response.GetResponseStream();
             if (responseStream != null)
             {
-                var jObject = JObject.Load(new JsonTextReader(new StreamReader(responseStream)));
-                _artists = from artistName in jObject["artists"].Values<string>()
-                select new Artist(artistName);                
-            }
+                _musicLibraryJsonData = JObject.Load(new JsonTextReader(new StreamReader(responseStream)));
+            }                                 
         }
-    }
 
-    public class Artist : IArtist
-    {
-        public Artist(string artistName)
+        public IEnumerable<IArtist> GetArtists()
         {
-            Name = artistName;
+            return from artist in _musicLibraryJsonData["artists"]
+                select new Artist(artist["name"].Value<string>());
         }
 
-        public string Name { get; private set; }
+        public IEnumerable<IAlbum> GetAlbums(string queryArtistName)
+        {
+            return from artist in _musicLibraryJsonData["artists"]
+                where artist.Value<string>().Equals(queryArtistName)
+                let albums = artist["albums"]
+                from albumOfArtist in albums
+                select new Album(artist["name"].Value<string>(), albumOfArtist["title"].Value<string>(),
+                    albumOfArtist["image"].Value<string>(),
+                    albumOfArtist["description"].Value<string>(),
+                    albumOfArtist["date"].Value<string>());
+        }
+
+        public IEnumerable<ISong> GetSongs(string queryArtistName, string queryAlbumTitle)
+        {
+            return from artist in _musicLibraryJsonData["artists"]
+                   where artist.Value<string>().Equals(queryArtistName)
+                   let albums = artist["albums"]
+                   from albumOfArtist in albums
+                   where albumOfArtist["title"].Value<string>().Equals(queryAlbumTitle)
+                   from songOfAlbum in albumOfArtist["songs"]
+                   select new Song(albumOfArtist["title"].Value<string>(), songOfAlbum["title"].Value<string>(),
+                                            songOfAlbum["length"].Value<string>());
+        }
     }
 }

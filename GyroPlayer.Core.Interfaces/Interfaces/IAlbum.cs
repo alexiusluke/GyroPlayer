@@ -2,14 +2,16 @@
 
 namespace GyroPlayer.Core.Interfaces
 {
-    public interface IAlbum
+    public interface IAlbum :IEquatable<IAlbum>
     {        
         string Title { get; }
 
-        string ImageUrl { get; }
+        Uri ImageUrl { get; }
 
         string Description { get; }
 
         DateTime Date { get; }
+
+        string ArtistName { get; }
     }
 }

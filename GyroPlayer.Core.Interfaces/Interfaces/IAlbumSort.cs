@@ -4,6 +4,13 @@ namespace GyroPlayer.Core.Interfaces
 {
     public interface IAlbumSort
     {
-        IEnumerable<IAlbum> Sort();
+        string SortDisplayString { get; }
+
+        IEnumerable<IAlbum> Sort(IEnumerable<IAlbum> album);
+    }
+
+    public class Sort<T>
+    {
+        
     }
 }
