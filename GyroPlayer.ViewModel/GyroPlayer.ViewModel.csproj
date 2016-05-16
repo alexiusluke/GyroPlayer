@@ -40,8 +40,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlbumListViewModel.cs" />
+    <Compile Include="AlbumSongViewModel.cs" />
+    <Compile Include="AlbumTitleViewModel.cs" />
+    <Compile Include="AlbumViewModel.cs" />
+    <Compile Include="AlphabeticalSort.cs" />
+    <Compile Include="ArtistListViewModel.cs" />
+    <Compile Include="ArtistViewModel.cs" />
     <Compile Include="GyroMusicPlayerViewModel.cs" />
+    <Compile Include="IMusicPlayerSelectionController.cs" />
+    <Compile Include="Interfaces\ISortLogic.cs" />
+    <Compile Include="Interfaces\ISortOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReleaseDateSort.cs" />
+    <Compile Include="SongListViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GyroPlayer.Core.Interfaces\GyroPlayer.Core.Interfaces.csproj">
+      <Project>{1D552E88-8325-4A4D-8A76-835FAD9A1157}</Project>
+      <Name>GyroPlayer.Core.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

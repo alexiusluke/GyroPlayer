@@ -95,7 +95,16 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\GyroPlayer.Core.Interfaces\GyroPlayer.Core.Interfaces.csproj">
+      <Project>{1d552e88-8325-4a4d-8a76-835fad9a1157}</Project>
+      <Name>GyroPlayer.Core.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GyroPlayer.ViewModel\GyroPlayer.ViewModel.csproj">
+      <Project>{dfd78b01-282b-433b-a58e-b1f620cf08f0}</Project>
+      <Name>GyroPlayer.ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

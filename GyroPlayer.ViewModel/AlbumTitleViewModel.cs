@@ -8,11 +8,19 @@ using System.Threading.Tasks;
 
 namespace GyroPlayer.ViewModel
 {
-    public class GyroMusicPlayerViewModel : INotifyPropertyChanged
+    public class AlbumTitleViewModel : INotifyPropertyChanged
     {
-        public ArtistListViewModel ArtistsPaneVm { get; set; }
+        private string _albumTitle;
 
-        public AlbumListViewModel AlbumsPaneVm { get; set; }
+        public string AlbumTitle
+        {
+            get { return _albumTitle; }
+            set
+            {
+                _albumTitle = value;
+                OnPropertyChanged();
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
