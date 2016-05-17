@@ -17,12 +17,12 @@ namespace GyroPlayer.ViewModel
         public string SortText => "Release Date";
         public IEnumerable<T> SortAscending(IEnumerable<T> input)
         {
-            return input.OrderBy(_dateSortFunc);
+            return input?.OrderBy(_dateSortFunc);
         }
 
         public IEnumerable<T> SortDescending(IEnumerable<T> input)
         {
-            return input.OrderByDescending(_dateSortFunc);
+            return input?.OrderByDescending(_dateSortFunc);
         }
     }
 }

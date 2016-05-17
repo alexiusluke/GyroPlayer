@@ -2,7 +2,7 @@
 
 namespace GyroPlayer.Core
 {
-    internal interface ISongPlayManager
+    public interface ISongPlayManager
     {
         void AddListenCount(ISong song);
 

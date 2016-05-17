@@ -23,7 +23,6 @@ namespace GyroPlayer.Core
 
         public void BuildData()
         {           
-            //"https://gist.githubusercontent.com/edj-boston/77b2cdc0cad5b5d42219/raw/1366c213a5b0ae29f1d29d0bc1d22d29f2586068/music.json";
             WebRequest request = WebRequest.Create(new Uri(_jsonUri));
             request.ContentType = "application/json; charset=utf-8";
             var response = (HttpWebResponse) request.GetResponse();
@@ -43,7 +42,7 @@ namespace GyroPlayer.Core
         public IEnumerable<IAlbum> GetAlbums(string queryArtistName)
         {
             return from artist in _musicLibraryJsonData["artists"]
-                where artist.Value<string>().Equals(queryArtistName)
+                where artist["name"].Value<string>().Equals(queryArtistName)
                 let albums = artist["albums"]
                 from albumOfArtist in albums
                 select new Album(artist["name"].Value<string>(), albumOfArtist["title"].Value<string>(),
@@ -55,7 +54,7 @@ namespace GyroPlayer.Core
         public IEnumerable<ISong> GetSongs(string queryArtistName, string queryAlbumTitle)
         {
             return from artist in _musicLibraryJsonData["artists"]
-                   where artist.Value<string>().Equals(queryArtistName)
+                   where artist["name"].Value<string>().Equals(queryArtistName)
                    let albums = artist["albums"]
                    from albumOfArtist in albums
                    where albumOfArtist["title"].Value<string>().Equals(queryAlbumTitle)

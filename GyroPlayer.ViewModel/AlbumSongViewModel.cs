@@ -12,7 +12,7 @@ namespace GyroPlayer.ViewModel
     public class AlbumSongViewModel : INotifyPropertyChanged
     {
         private string _songTitle;
-        private int _trackNumber;
+        private string _trackNumber;
         private ISong _song;
 
         public AlbumSongViewModel(ISong song)
@@ -21,7 +21,7 @@ namespace GyroPlayer.ViewModel
             SongTitle = _song.Title;
         }
 
-        public int TrackNumber
+        public string TrackNumber
         {
             get { return _trackNumber; }
             set

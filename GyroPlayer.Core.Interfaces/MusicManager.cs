@@ -5,7 +5,7 @@ using GyroPlayer.Core.Interfaces;
 
 namespace GyroPlayer.Core
 {
-    class MusicManager : IMusicManager
+    public class MusicManager : IMusicManager
     {
         private readonly IMusicSourceDataAccess _musicDataAccess;
         private IEnumerable<IArtist> _artists;

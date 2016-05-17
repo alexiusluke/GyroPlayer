@@ -31,8 +31,14 @@ namespace GyroPlayer.ViewModel
                 new AlphabeticalSort<AlbumViewModel>(album => album.AlbumTitle),
                 new ReleaseDateSort<AlbumViewModel>(album => album.ReleaseDate)
             };
-            _musicPlayerSelectionController.MusicLibrarySelectionEvent += MusicPlayerSelectionControllerOnMusicLibrarySelectionEvent;
+            SelectedAlbumSortOption = AlbumSortOptions.FirstOrDefault();
+            _musicPlayerSelectionController.ArtistSelectedEvent += _musicPlayerSelectionController_ArtistSelectedEvent; ;
             UpdateAlbums();                                                          
+        }
+
+        private void _musicPlayerSelectionController_ArtistSelectedEvent(object sender, EventArgs e)
+        {
+            UpdateAlbums();
         }
 
         private void UpdateAlbums()
@@ -41,18 +47,12 @@ namespace GyroPlayer.ViewModel
             {
                 var artists = _musicManager.GetAllArtists()
                     .Where(obj => obj.Name == _musicPlayerSelectionController.SelectedArtistName);
-                var albumViewModels = _musicManager.GetAlbums(artists).Select(album => new AlbumViewModel(album));                
-                AlbumsList = SortAlbums(albumViewModels);
-                var albumsList = AlbumsList as AlbumViewModel[] ?? AlbumsList.ToArray();
-                SelectedAlbum = albumsList.FirstOrDefault();
-                AlbumCount = albumsList.Count();
+                var albumViewModels = _musicManager.GetAlbums(artists).Select(album => new AlbumViewModel(album)).ToList();                
+                AlbumsList = SortAlbums(albumViewModels);                
+                SelectedAlbum = albumViewModels.FirstOrDefault();
+                AlbumCount = albumViewModels.Count();
             }            
-        }
-
-        private void MusicPlayerSelectionControllerOnMusicLibrarySelectionEvent(object sender, MusicSelectionArgs musicSelectionArgs)
-        {
-            UpdateAlbums();
-        }
+        }      
 
         public int AlbumCount
         {
@@ -77,8 +77,10 @@ namespace GyroPlayer.ViewModel
             {
                 if (_selectedAlbumSortOption != value)
                 {
-                    _selectedAlbumSortOption = value;                                       
+                    _selectedAlbumSortOption = value;
+                    var lastSelectedAlbum = SelectedAlbum;                                    
                     AlbumsList = SortAlbums(AlbumsList);
+                    SelectedAlbum = lastSelectedAlbum;
                 }
                 OnPropertyChanged(nameof(SelectedAlbumSortOption));
             }
@@ -89,11 +91,11 @@ namespace GyroPlayer.ViewModel
             IEnumerable<AlbumViewModel> sortedAlbums;
             if (IsSortAscending)
             {
-                sortedAlbums = _selectedAlbumSortOption.SortAscending(albumViewModels);
+                sortedAlbums = _selectedAlbumSortOption?.SortAscending(albumViewModels);
             }
             else
             {
-                sortedAlbums = _selectedAlbumSortOption.SortDescending(albumViewModels);
+                sortedAlbums = _selectedAlbumSortOption?.SortDescending(albumViewModels);
             }
             return sortedAlbums;
         }
@@ -106,14 +108,9 @@ namespace GyroPlayer.ViewModel
                 if (_isSortAscending != value)
                 {
                     _isSortAscending = value;
-                    if (IsSortAscending)
-                    {
-                        AlbumsList = _selectedAlbumSortOption.SortAscending(AlbumsList);
-                    }
-                    else
-                    {
-                        AlbumsList = _selectedAlbumSortOption.SortDescending(AlbumsList);
-                    }
+                    var lastSelectedAlbum = SelectedAlbum;                                       
+                    AlbumsList = SortAlbums(AlbumsList);
+                    SelectedAlbum = lastSelectedAlbum;
                 }
                 OnPropertyChanged(nameof(IsSortAscending));
             }
@@ -136,7 +133,10 @@ namespace GyroPlayer.ViewModel
             {
                 _selectedAlbum = value;
                 OnPropertyChanged(nameof(SelectedAlbum));
-                _musicPlayerSelectionController.SelectAlbum(_selectedAlbum.AlbumTitle);
+                if (_selectedAlbum != null)
+                {
+                    _musicPlayerSelectionController.SelectAlbum(_selectedAlbum.AlbumTitle);
+                }
             }
         }
 

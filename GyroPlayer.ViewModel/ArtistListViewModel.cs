@@ -22,10 +22,12 @@ namespace GyroPlayer.ViewModel
 
         public ArtistListViewModel(IMusicManager musicManager, IMusicPlayerSelectionController musicPlayerSelectionController)
         {
-            ArtistsList = musicManager.GetAllArtists().Select(artist => new ArtistViewModel(artist));
-            ArtistCount = ArtistsList.Count();
-            ArtistSortOptions = new[] {new AlphabeticalSort<ArtistViewModel>(artist => artist.ArtistName)};
             _musicPlayerSelectionController = musicPlayerSelectionController;
+            ArtistsList = musicManager.GetAllArtists().Select(artist => new ArtistViewModel(artist)).ToList();
+            ArtistCount = ArtistsList.Count();
+            SelectedArtist = ArtistsList.FirstOrDefault();
+            ArtistSortOptions = new[] {new AlphabeticalSort<ArtistViewModel>(artist => artist.ArtistName)};
+            SelectedArtistSortOption = ArtistSortOptions.FirstOrDefault();            
         }
 
         public int ArtistCount
@@ -73,19 +75,28 @@ namespace GyroPlayer.ViewModel
                 if (_isSortAscending != value)
                 {
                     _isSortAscending = value;
-                    if (IsSortAscending)
-                    {                        
-                        ArtistsList = _selectedArtistSortOption.SortAscending(ArtistsList);
-                    }
-                    else
-                    {
-                        ArtistsList = _selectedArtistSortOption.SortDescending(ArtistsList);
-                    }
+                    var lastSelectedArtist = SelectedArtist;                    
+                    ArtistsList = SortArtistList();
+                    SelectedArtist = lastSelectedArtist;
                 }
                 OnPropertyChanged(nameof(IsSortAscending));
             }
         }
-       
+
+        private IEnumerable<ArtistViewModel> SortArtistList()
+        {
+            IEnumerable<ArtistViewModel> sortedArtistList;
+            if (IsSortAscending)
+            {
+                sortedArtistList = _selectedArtistSortOption.SortAscending(ArtistsList);
+            }
+            else
+            {
+                sortedArtistList = _selectedArtistSortOption.SortDescending(ArtistsList);
+            }
+            return sortedArtistList;
+        }
+
         public IEnumerable<ArtistViewModel> ArtistsList
         {
             get { return _artistsList; }
@@ -100,10 +111,13 @@ namespace GyroPlayer.ViewModel
         {
             get { return _selectedArtist; }
             set
-            {
+            {                
                 _selectedArtist = value;
                 OnPropertyChanged(nameof(SelectedArtist));
-                _musicPlayerSelectionController.SelectArtist(_selectedArtist.ArtistName);
+                if (_selectedArtist != null)
+                {
+                    _musicPlayerSelectionController?.SelectArtist(_selectedArtist.ArtistName);
+                }
             }
         }
 

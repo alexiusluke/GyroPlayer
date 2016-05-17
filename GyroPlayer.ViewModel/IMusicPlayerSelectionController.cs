@@ -8,7 +8,8 @@ namespace GyroPlayer.ViewModel
 {
     public interface IMusicPlayerSelectionController
     {
-        event EventHandler<MusicSelectionArgs> MusicLibrarySelectionEvent;
+        event EventHandler<EventArgs> ArtistSelectedEvent;
+        event EventHandler<EventArgs> AlbumSelectedEvent;
         string SelectedArtistName { get; }
         string SelectedAlbumTitle { get; }
         void SelectArtist(string artistName);
@@ -19,28 +20,29 @@ namespace GyroPlayer.ViewModel
     {
         private string _selectedArtistName;
         private string _selectedAlbumTitle;        
-        public event EventHandler<MusicSelectionArgs> MusicLibrarySelectionEvent = delegate {};
+        public event EventHandler<EventArgs> ArtistSelectedEvent = delegate {};
+        public event EventHandler<EventArgs> AlbumSelectedEvent = delegate { };
 
-        public string SelectedArtistName
-        {
-            get { return _selectedArtistName; }
-        }
+        public string SelectedArtistName => _selectedArtistName;
 
-        public string SelectedAlbumTitle
-        {
-            get { return _selectedAlbumTitle; }
-        }
+        public string SelectedAlbumTitle => _selectedAlbumTitle;
 
         public void SelectArtist(string artistName)
         {
-            _selectedArtistName = artistName;
-            MusicLibrarySelectionEvent(this, new MusicSelectionArgs(artistName, null, null));
+            if (_selectedArtistName != artistName)
+            {
+                _selectedArtistName = artistName;
+                ArtistSelectedEvent(this, null);
+            }            
         }
 
         public void SelectAlbum(string albumTitle)
         {
-            _selectedAlbumTitle = albumTitle;
-            MusicLibrarySelectionEvent(this, new MusicSelectionArgs(_selectedArtistName, _selectedAlbumTitle, null));
+            if (_selectedAlbumTitle != albumTitle)
+            {
+                _selectedAlbumTitle = albumTitle;
+                AlbumSelectedEvent(this, null);
+            }            
         }
     }
 

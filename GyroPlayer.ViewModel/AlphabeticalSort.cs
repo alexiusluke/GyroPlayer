@@ -18,12 +18,12 @@ namespace GyroPlayer.ViewModel
 
         public IEnumerable<T> SortAscending(IEnumerable<T> input)
         {           
-            return input.OrderBy(_selector);               
+            return input?.OrderBy(_selector);               
         }
 
         public IEnumerable<T> SortDescending(IEnumerable<T> input)
         {
-            return input.OrderByDescending(_selector);
+            return input?.OrderByDescending(_selector);
         }
     }
 }

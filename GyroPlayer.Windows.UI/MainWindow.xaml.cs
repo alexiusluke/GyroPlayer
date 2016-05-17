@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GyroPlayer.ViewModel;
 
 namespace LegantPlayer
 {
@@ -24,6 +25,12 @@ namespace LegantPlayer
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += OnLoaded;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            DataContext = new GyroMusicPlayerViewModel();
         }
     }
 }

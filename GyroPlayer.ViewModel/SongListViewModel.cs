@@ -13,7 +13,7 @@ namespace GyroPlayer.ViewModel
     public class SongListViewModel : INotifyPropertyChanged
     {
         private int _songCount;
-        private ISortLogic<AlbumSongViewModel> _selectedAlbumSortOption;
+        private ISortLogic<AlbumSongViewModel> _selectedSongSortOption;
         private IEnumerable<AlbumSongViewModel> _songsList;
         private bool _isSortAscending;
         private ISortLogic<AlbumSongViewModel>[] _songSortOptions;
@@ -30,7 +30,13 @@ namespace GyroPlayer.ViewModel
             {
                 new AlphabeticalSort<AlbumSongViewModel>(album => album.SongTitle)
             };
-            _musicPlayerSelectionController.MusicLibrarySelectionEvent += MusicPlayerSelectionControllerOnMusicLibrarySelectionEvent;
+            SelectedSongSortOption = SongSortOptions.FirstOrDefault();
+            _musicPlayerSelectionController.AlbumSelectedEvent += MusicPlayerSelectionControllerOnAlbumSelectedEvent;
+            UpdateSongsList();
+        }
+
+        private void MusicPlayerSelectionControllerOnAlbumSelectedEvent(object sender, EventArgs eventArgs)
+        {
             UpdateSongsList();
         }
 
@@ -42,18 +48,14 @@ namespace GyroPlayer.ViewModel
                 var artists = _musicManager.GetAllArtists()
                     .Where(obj => obj.Name.Equals(_musicPlayerSelectionController.SelectedArtistName));
                 var albums = _musicManager.GetAlbums(artists).Where(obj => obj.Title.Equals(_musicPlayerSelectionController.SelectedAlbumTitle));
-                var songs = _musicManager.GetSong(albums).Select(obj => new AlbumSongViewModel(obj));
+                var songs = _musicManager.GetSong(albums).Select(obj => new AlbumSongViewModel(obj)).ToList();
+                var lastSelectedSongTitle = SelectedSong?.SongTitle;
                 SongsList = SortSongs(songs);
-                var songsList = SongsList as AlbumSongViewModel[] ?? SongsList.ToArray();
-                SelectedSong = songsList.FirstOrDefault();
-                SongCount = songsList.Count();
+                var lastSelectedSong = SongsList.SingleOrDefault(song => song.SongTitle.Equals(lastSelectedSongTitle));
+                SelectedSong = lastSelectedSong ?? songs.FirstOrDefault();
+                SongCount = songs.Count();
             }
-        }
-
-        private void MusicPlayerSelectionControllerOnMusicLibrarySelectionEvent(object sender, MusicSelectionArgs musicSelectionArgs)
-        {
-            UpdateSongsList();
-        }
+        }        
 
         public int SongCount
         {
@@ -71,17 +73,17 @@ namespace GyroPlayer.ViewModel
             set { _songSortOptions = value; }
         }
 
-        public ISortLogic<AlbumSongViewModel> SelectedAlbumSortOption
+        public ISortLogic<AlbumSongViewModel> SelectedSongSortOption
         {
-            get { return _selectedAlbumSortOption; }
+            get { return _selectedSongSortOption; }
             set
             {
-                if (_selectedAlbumSortOption != value)
+                if (_selectedSongSortOption != value)
                 {
-                    _selectedAlbumSortOption = value;
+                    _selectedSongSortOption = value;
                     SongsList = SortSongs(SongsList);
                 }
-                OnPropertyChanged(nameof(SelectedAlbumSortOption));
+                OnPropertyChanged(nameof(SelectedSongSortOption));
             }
         }
 
@@ -90,15 +92,15 @@ namespace GyroPlayer.ViewModel
             IEnumerable<AlbumSongViewModel> sortedAlbums;
             if (IsSortAscending)
             {
-                sortedAlbums = _selectedAlbumSortOption.SortAscending(albumViewModels);
+                sortedAlbums = _selectedSongSortOption?.SortAscending(albumViewModels);
             }
             else
             {
-                sortedAlbums = _selectedAlbumSortOption.SortDescending(albumViewModels);
+                sortedAlbums = _selectedSongSortOption?.SortDescending(albumViewModels);
             }
-            sortedAlbums = sortedAlbums.Select((obj, index) =>
+            sortedAlbums = sortedAlbums?.Select((obj, index) =>
             {
-                obj.TrackNumber = index + 1;
+                obj.TrackNumber = (index + 1).ToString("D" + SongCount.ToString().Length);
                 return obj;
             });
             return sortedAlbums;
@@ -112,14 +114,9 @@ namespace GyroPlayer.ViewModel
                 if (_isSortAscending != value)
                 {
                     _isSortAscending = value;
-                    if (IsSortAscending)
-                    {
-                        SongsList = _selectedAlbumSortOption.SortAscending(SongsList);
-                    }
-                    else
-                    {
-                        SongsList = _selectedAlbumSortOption.SortDescending(SongsList);
-                    }
+                    var lastSelecteSong = SelectedSong;                   
+                    SongsList = SortSongs(SongsList);
+                    SelectedSong = lastSelecteSong;
                 }
                 OnPropertyChanged(nameof(IsSortAscending));
             }
